@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodieFinder</title>
+  <link rel="stylesheet" href="food.css">
+</head>
+<body>
+
+<header class="navbar">
+  <h1 class="logo">FoodieFinder</h1>
+  <nav>
+    <a href="#search">Search</a>
+    <a href="#features">Features</a>
+    <a href="#about">About</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h2>Find Food You’ll Love</h2>
+  <p>Discover restaurants that match your taste, budget, and lifestyle.</p>
+</section>
+
+<section id="search" class="search-section">
+  <h3>Filter Your Search</h3>
+
+  <form class="filter-form">
+    <!-- Keyword -->
+    <div class="filter-group">
+      <label for="keyword">Keyword</label>
+      <input type="text" id="keyword" placeholder="Pizza, sushi, burgers...">
+    </div>
+
+    <!-- Cuisine -->
+    <div class="filter-group">
+      <label for="cuisine">Cuisine</label>
+      <select id="cuisine">
+        <option value="">Any</option>
+        <option>Italian</option>
+        <option>Mexican</option>
+        <option>Asian</option>
+        <option>American</option>
+        <option>Indian</option>
+      </select>
+    </div>
+
+    <!-- Price -->
+    <div class="filter-group">
+      <label for="price">Price Range</label>
+      <select id="price">
+        <option value="">Any</option>
+        <option>$</option>
+        <option>$$</option>
+        <option>$$$</option>
+      </select>
+    </div>
+
+    <!-- Dietary -->
+    <div class="filter-group">
+      <label for="diet">Dietary Preferences</label>
+      <select id="diet">
+        <option value="">None</option>
+        <option>Vegetarian</option>
+        <option>Vegan</option>
+        <option>Gluten-Free</option>
+        <option>Halal</option>
+      </select>
+    </div>
+
+    <!-- Distance -->
+    <div class="filter-group">
+      <label for="distance">Distance</label>
+      <select id="distance">
+        <option value="">Any</option>
+        <option>1 mile</option>
+        <option>5 miles</option>
+        <option>10 miles</option>
+      </select>
+    </div>
+
+    <!-- Button -->
+    <button type="submit" class="search-btn">Find Restaurants</button>
+  </form>
+</section>
+
+<section id="features" class="features">
+  <h3>Why FoodieFinder?</h3>
+  <ul>
+    <li>Personalized food recommendations</li>
+    <li>Advanced filtering options</li>
+    <li>Save favorite restaurants</li>
+    <li>Quick decision-making when hungry</li>
+  </ul>
+</section>
+
+<section id="about" class="about">
+  <h3>About FoodieFinder</h3>
+  <p>
+    FoodieFinder is designed to reduce the frustration of choosing where to eat by
+    helping users quickly find restaurants that match their preferences.
+  </p>
+</section>
+
+<footer class="footer">
+  <p>&copy; 2026 FoodieFinder</p>
+</footer>
+
+</body>
+</html>
