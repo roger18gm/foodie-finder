@@ -28,7 +28,7 @@ function App() {
                 }
             })
 
-            const response = await fetch(`${apiBaseUrl}/restaurants?${queryParams}`)
+            const response = await fetch(`${apiBaseUrl}/food?${queryParams}`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch restaurants: ${response.status}`)
