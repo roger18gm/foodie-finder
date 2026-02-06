@@ -51,11 +51,11 @@ const SearchSection = ({ onSearch, loading, error, restaurants }) => {
                         onChange={handleInputChange}
                     >
                         <option value="">Any</option>
-                        <option value="italian">Italian</option>
-                        <option value="mexican">Mexican</option>
-                        <option value="asian">Asian</option>
-                        <option value="american">American</option>
-                        <option value="indian">Indian</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Mexican">Mexican</option>
+                        <option value="Asian">Asian</option>
+                        <option value="American">American</option>
+                        <option value="Indian">Indian</option>
                     </select>
                 </div>
 

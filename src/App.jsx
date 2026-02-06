@@ -35,7 +35,8 @@ function App() {
             }
 
             const data = await response.json()
-            setRestaurants(data.restaurants || [])
+            // Handle both array response and wrapped response
+            setRestaurants(Array.isArray(data) ? data : (data.restaurants || []))
         } catch (err) {
             console.error('Search error:', err)
             setError(err.message)
