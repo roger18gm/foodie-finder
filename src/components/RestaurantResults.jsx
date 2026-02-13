@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import americanImage from '../images/American.avif'
 import american2Image from '../images/American2.avif'
 import asianImage from '../images/Asian.avif'
@@ -91,6 +92,12 @@ const RestaurantResults = ({ restaurants, loading }) => {
                                 {restaurant.address && (
                                     <p className="address">{restaurant.address}</p>
                                 )}
+                                <Link
+                                    to={`/restaurants/${restaurant.restaurantId}`}
+                                    className="view-details-btn"
+                                >
+                                    View Details
+                                </Link>
                             </div>
                             <div className="restaurant-image">
                                 <img 
