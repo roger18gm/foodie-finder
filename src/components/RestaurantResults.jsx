@@ -31,12 +31,12 @@ const RestaurantResults = ({ restaurants, loading }) => {
     const getRestaurantImage = (restaurant) => {
         const cuisineType = restaurant.cuisineType?.toLowerCase() || ''
         const keywords = restaurant.keywords?.map(k => k.toLowerCase()) || []
-        
+
         // Check for pizza keyword first
         if (keywords.includes('pizza') || cuisineType.includes('pizza')) {
             return pizzaImage
         }
-        
+
         // Map cuisine types to images
         const imageMap = {
             'italian': italianImage,
@@ -49,19 +49,19 @@ const RestaurantResults = ({ restaurants, loading }) => {
             'american': americanImage,
             'indian': asianImage, // Fallback to Asian for Indian
         }
-        
+
         // Try exact match first
         if (imageMap[cuisineType]) {
             return imageMap[cuisineType]
         }
-        
+
         // Try partial match
         for (const [key, value] of Object.entries(imageMap)) {
             if (cuisineType.includes(key)) {
                 return value
             }
         }
-        
+
         // Default fallback
         return americanImage
     }
@@ -100,8 +100,8 @@ const RestaurantResults = ({ restaurants, loading }) => {
                                 </Link>
                             </div>
                             <div className="restaurant-image">
-                                <img 
-                                    src={getRestaurantImage(restaurant)} 
+                                <img
+                                    src={getRestaurantImage(restaurant)}
                                     alt={restaurant.restaurantName}
                                     onError={(e) => {
                                         // Fallback if image fails to load

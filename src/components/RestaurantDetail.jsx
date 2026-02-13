@@ -9,6 +9,20 @@ const RestaurantDetail = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
+    // Reviews state
+    const [reviews, setReviews] = useState([])
+    const [reviewsLoading, setReviewsLoading] = useState(false)
+    const [reviewsError, setReviewsError] = useState(null)
+
+    // Review form state
+    const [reviewForm, setReviewForm] = useState({
+        username: '',
+        rating: 5,
+        comment: ''
+    })
+    const [submitting, setSubmitting] = useState(false)
+    const [submitSuccess, setSubmitSuccess] = useState(false)
+
     // Helper function to convert price number to $ signs
     const formatPrice = (priceLevel) => {
         if (!priceLevel) return 'N/A'
@@ -46,6 +60,93 @@ const RestaurantDetail = () => {
 
         fetchRestaurant()
     }, [id, searchParams])
+
+    // Fetch reviews
+    useEffect(() => {
+        const fetchReviews = async () => {
+            setReviewsLoading(true)
+            setReviewsError(null)
+
+            try {
+                const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+                const response = await fetch(`${apiBaseUrl}/reviews?restaurantId=${id}`)
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch reviews: ${response.status}`)
+                }
+
+                const data = await response.json()
+                // Sort reviews by createdAt (newest first)
+                const sortedReviews = (Array.isArray(data) ? data : []).sort((a, b) => b.createdAt - a.createdAt)
+                setReviews(sortedReviews)
+            } catch (err) {
+                console.error('Reviews fetch error:', err)
+                setReviewsError(err.message)
+            } finally {
+                setReviewsLoading(false)
+            }
+        }
+
+        if (id) {
+            fetchReviews()
+        }
+    }, [id])
+
+    // Handle review form submission
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault()
+        setSubmitting(true)
+        setSubmitSuccess(false)
+
+        try {
+            const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+            const response = await fetch(`${apiBaseUrl}/reviews`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    restaurantId: id,
+                    username: reviewForm.username || 'anonymous',
+                    rating: reviewForm.rating,
+                    comment: reviewForm.comment
+                })
+            })
+
+            if (!response.ok) {
+                throw new Error(`Failed to submit review: ${response.status}`)
+            }
+
+            // Reset form and show success
+            setReviewForm({ username: '', rating: 5, comment: '' })
+            setSubmitSuccess(true)
+
+            // Refresh reviews list
+            const reviewsResponse = await fetch(`${apiBaseUrl}/reviews?restaurantId=${id}`)
+            if (reviewsResponse.ok) {
+                const data = await reviewsResponse.json()
+                const sortedReviews = (Array.isArray(data) ? data : []).sort((a, b) => b.createdAt - a.createdAt)
+                setReviews(sortedReviews)
+            }
+
+            // Hide success message after 3 seconds
+            setTimeout(() => setSubmitSuccess(false), 3000)
+        } catch (err) {
+            console.error('Review submission error:', err)
+            alert('Failed to submit review. Please try again.')
+        } finally {
+            setSubmitting(false)
+        }
+    }
+
+    // Format date for reviews
+    const formatDate = (timestamp) => {
+        return new Date(timestamp).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        })
+    }
 
     if (loading) {
         return (
@@ -161,6 +262,81 @@ const RestaurantDetail = () => {
                         <p>📞 {restaurant.phone}</p>
                     </div>
                 )}
+
+                {/* Reviews Section */}
+                <div className="detail-section reviews-section">
+                    <h3>Reviews ({reviews.length})</h3>
+
+                    {/* Add Review Form */}
+                    <div className="add-review-form">
+                        <h4>Write a Review</h4>
+                        {submitSuccess && (
+                            <div className="success-message">
+                                Review submitted successfully! ✓
+                            </div>
+                        )}
+                        <form onSubmit={handleReviewSubmit}>
+                            <div className="form-group">
+                                <label htmlFor="username">Name (optional)</label>
+                                <input
+                                    type="text"
+                                    id="username"
+                                    placeholder="Anonymous"
+                                    value={reviewForm.username}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, username: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="rating">Rating</label>
+                                <select
+                                    id="rating"
+                                    value={reviewForm.rating}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, rating: Number(e.target.value) })}
+                                    required
+                                >
+                                    <option value={5}>5 - Excellent</option>
+                                    <option value={4}>4 - Very Good</option>
+                                    <option value={3}>3 - Good</option>
+                                    <option value={2}>2 - Fair</option>
+                                    <option value={1}>1 - Poor</option>
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="comment">Comment</label>
+                                <textarea
+                                    id="comment"
+                                    rows="4"
+                                    placeholder="Share your experience..."
+                                    value={reviewForm.comment}
+                                    onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <button type="submit" className="submit-review-btn" disabled={submitting}>
+                                {submitting ? 'Submitting...' : 'Submit Review'}
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Reviews List */}
+                    <div className="reviews-list">
+                        {reviewsLoading && <p className="loading-text">Loading reviews...</p>}
+                        {reviewsError && <p className="error-text">Error loading reviews: {reviewsError}</p>}
+                        {!reviewsLoading && !reviewsError && reviews.length === 0 && (
+                            <p className="no-reviews">No reviews yet. Be the first to review!</p>
+                        )}
+                        {!reviewsLoading && reviews.map((review) => (
+                            <div key={review.reviewId} className="review-card">
+                                <div className="review-header">
+                                    <span className="review-username">{review.username}</span>
+                                    <span className="review-rating">{'⭐'.repeat(review.rating)}</span>
+                                </div>
+                                <p className="review-comment">{review.comment}</p>
+                                <span className="review-date">{formatDate(review.createdAt)}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     )
