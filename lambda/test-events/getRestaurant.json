@@ -1,0 +1,8 @@
+{
+  "pathParameters": {
+    "id": "rest_001"
+  },
+  "queryStringParameters": {
+    "cuisineType": "Italian"
+  }
+}

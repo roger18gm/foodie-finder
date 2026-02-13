@@ -116,6 +116,39 @@ This app is designed to be deployed on AWS Amplify with automatic CI/CD from Git
 4. Deploy to AWS Amplify
 5. Configure custom domain (optional)
 
+## Troubleshooting: "Failed to fetch restaurant(s)"
+
+This error can come from the **browser** (request never reaches the server) or from the **backend** (API returns 4xx/5xx). Check the exact message and DevTools → Network tab to tell which.
+
+### If the message is just "Failed to fetch" (no status code)
+
+The request is failing before a response is received. Common causes with **API Gateway + Lambda**:
+
+| Cause | What to check |
+|-------|----------------|
+| **CORS** | API Gateway must allow your frontend origin. Add `Access-Control-Allow-Origin` (e.g. `https://your-app.amplifyapp.com` or `http://localhost:5173`) in the Lambda response *and* enable CORS for the API/resource in API Gateway. |
+| **Wrong URL** | `.env`: `VITE_API_BASE_URL` must be your API Gateway invoke URL (e.g. `https://abc123.execute-api.us-east-1.amazonaws.com`) with no trailing slash. Redeploy/restart the app after changing `.env`. |
+| **API not deployed** | In API Gateway, deploy the API to a stage (e.g. `prod`) and use the full URL including stage: `.../prod/search`. |
+| **Network / DNS** | From the same machine, run `curl -v "https://your-api-url/prod/search"`. If that fails, the problem is outside the app (firewall, VPN, wrong URL). |
+
+### If the message includes a status code (e.g. "Failed to fetch restaurant: 502")
+
+The request reaches API Gateway/Lambda but the backend returns an error:
+
+| Status | Likely cause | What to check |
+|--------|----------------|---------------|
+| **502 Bad Gateway** | Lambda throws, times out, or returns invalid response. | CloudWatch logs for the Lambda; ensure Lambda returns a proper API Gateway response (statusCode, headers, body). |
+| **504 Gateway Timeout** | Lambda runs too long. | Increase Lambda timeout (max 15 min); optimize Lambda or DB queries. |
+| **403** | Forbidden. | API Gateway resource policy; Lambda permissions; authorizer (if any). |
+| **404** | Not found. | Route/path in API Gateway (e.g. `/search`, `/restaurants/{id}`) must match what the app calls. |
+| **500** | Unhandled error in Lambda. | CloudWatch logs for the function; fix the error or add error handling. |
+
+### Quick checks
+
+1. **Browser DevTools → Network**: See the failing request URL, status, and response body.
+2. **CloudWatch**: Open the log group for your Lambda and look for errors when you trigger the request.
+3. **API Gateway**: Test the route in the console (e.g. "Test" for the resource) to see if the integration returns 200.
+
 ## Contributing
 
 1. Fork the repository

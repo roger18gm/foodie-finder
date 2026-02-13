@@ -93,7 +93,7 @@ const RestaurantResults = ({ restaurants, loading }) => {
                                     <p className="address">{restaurant.address}</p>
                                 )}
                                 <Link
-                                    to={`/restaurants/${restaurant.restaurantId}`}
+                                    to={`/restaurants/${restaurant.restaurantId}?cuisine=${encodeURIComponent(restaurant.cuisineType || '')}`}
                                     className="view-details-btn"
                                 >
                                     View Details

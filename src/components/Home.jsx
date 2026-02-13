@@ -27,7 +27,8 @@ const Home = () => {
             const response = await fetch(`${apiBaseUrl}/search?${queryParams}`)
 
             if (!response.ok) {
-                throw new Error(`Failed to fetch restaurants: ${response.status}`)
+                const body = await response.text()
+                throw new Error(`Failed to fetch restaurants: ${response.status}${body ? ` — ${body.slice(0, 100)}` : ''}`)
             }
 
             const data = await response.json()
@@ -35,7 +36,7 @@ const Home = () => {
             setRestaurants(Array.isArray(data) ? data : (data.restaurants || []))
         } catch (err) {
             console.error('Search error:', err)
-            setError(err.message)
+            setError(err.message || 'Failed to fetch restaurants')
         } finally {
             setLoading(false)
         }

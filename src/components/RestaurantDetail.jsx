@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 
 const RestaurantDetail = () => {
     const { id } = useParams()
+    const [searchParams] = useSearchParams()
     const navigate = useNavigate()
     const [restaurant, setRestaurant] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -21,24 +22,30 @@ const RestaurantDetail = () => {
 
             try {
                 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
-                const response = await fetch(`${apiBaseUrl}/restaurants/${id}`)
+                const cuisineType = searchParams.get('cuisine')
+                const url = cuisineType
+                    ? `${apiBaseUrl}/restaurants/${id}?cuisineType=${encodeURIComponent(cuisineType)}`
+                    : `${apiBaseUrl}/restaurants/${id}`
+                const response = await fetch(url)
 
                 if (!response.ok) {
-                    throw new Error(`Failed to fetch restaurant: ${response.status}`)
+                    const body = await response.text()
+                    throw new Error(`Failed to fetch restaurant: ${response.status}${body ? ` — ${body.slice(0, 100)}` : ''}`)
                 }
 
                 const data = await response.json()
                 setRestaurant(data)
             } catch (err) {
                 console.error('Fetch error:', err)
-                setError(err.message)
+                // Network errors (CORS, timeout, unreachable) often have message "Failed to fetch"
+                setError(err.message || 'Failed to fetch restaurant')
             } finally {
                 setLoading(false)
             }
         }
 
         fetchRestaurant()
-    }, [id])
+    }, [id, searchParams])
 
     if (loading) {
         return (
